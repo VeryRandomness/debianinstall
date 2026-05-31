@@ -1,5 +1,96 @@
 # Debian Server Setup — OptiPlex 3040
 
+## Before Running setup.sh
+
+Complete every step here before executing the script. Most of these can't be fixed mid-run without starting over.
+
+### 1. Fresh Debian Install
+
+- Use **manual partitioning** during install to match the disk layout in the Disk Layout section below
+- Set your hostname during install (e.g. `optiplex`)
+- Create a non-root user — the script uses `$SUDO_USER` to set up Syncthing and other per-user services
+- Do **not** install a desktop environment yet — set up all services headlessly first, then add a DE on top
+
+### 2. Add Your SSH Public Key
+
+The script disables SSH password authentication. If your key is not in place first, you will be locked out the moment the script runs that step.
+
+On your **local machine**, run:
+
+```bash
+ssh-copy-id christopher@<server-ip>
+```
+
+Or manually — on the **server**:
+
+```bash
+mkdir -p ~/.ssh
+echo 'ssh-ed25519 AAAA... your-key-here' >> ~/.ssh/authorized_keys
+chmod 700 ~/.ssh
+chmod 600 ~/.ssh/authorized_keys
+```
+
+Verify it works before proceeding:
+
+```bash
+# From your local machine — should log in without a password prompt
+ssh christopher@<server-ip>
+```
+
+Do not continue until passwordless SSH works.
+
+### 3. Verify Internet Access
+
+The script pulls from ~15 external sources. Check connectivity and DNS:
+
+```bash
+curl -I https://get.docker.com
+curl -I https://repo.jellyfin.org
+```
+
+### 4. Check Available Disk Space
+
+- `/` needs at least 10GB free before starting
+- `/var` needs at least 20GB free (Docker images, Jellyfin DB)
+- `/media` needs space for Docker volumes and media libraries
+
+```bash
+df -h
+```
+
+### 5. Note Your Non-Root Username
+
+The script reads `$SUDO_USER` to configure per-user services. Run it with `sudo`, not as root directly:
+
+```bash
+# Correct
+sudo bash setup.sh
+
+# Wrong — $SUDO_USER will be empty and Syncthing setup will fail
+su -
+bash setup.sh
+```
+
+### 6. Accept the Minecraft EULA
+
+The script sets `eula=true` automatically. By running setup.sh you are agreeing to the Minecraft End User Licence Agreement at <https://aka.ms/MinecraftEULA>. Read it first if you haven't.
+
+### 7. Get an AMP Licence Ready
+
+AMP (game server manager) requires a free personal licence from CubeCo before its installer will run. Register at <https://manage.cubecoders.com/Login> before you start — the AMP step will block waiting for it if you haven't.
+
+### 8. Run the Script
+
+Once all of the above is done:
+
+```bash
+sudo bash setup.sh
+```
+
+The script prints colour-coded status as it goes. Errors appear in red and stop execution. Warnings in yellow are non-fatal but note things needing manual follow-up after the run.
+
+---
+
 ## Hardware
 
 |Component|Spec                                      |
