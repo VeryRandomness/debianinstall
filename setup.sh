@@ -722,7 +722,26 @@ systemctl enable --now fail2ban
 
 # ── Security: SSH hardening ───────────────────────────────────
 step "Hardening SSH..."
-warn "Password auth will be DISABLED. Make sure your SSH key is already in ~/.ssh/authorized_keys before rebooting."
+
+# Collect candidate authorized_keys paths: the invoking user and root.
+_ssh_key_found=0
+for _candidate in \
+    "${HOME}/.ssh/authorized_keys" \
+    "/root/.ssh/authorized_keys" \
+    "/home/${SUDO_USER:-}/.ssh/authorized_keys"
+do
+    if [[ -s "$_candidate" ]]; then
+        _ssh_key_found=1
+        break
+    fi
+done
+
+if [[ $_ssh_key_found -eq 0 ]]; then
+    fatal "No SSH authorized_keys file found. Add your public key first:
+  mkdir -p ~/.ssh && echo '<your-pubkey>' >> ~/.ssh/authorized_keys && chmod 700 ~/.ssh && chmod 600 ~/.ssh/authorized_keys
+Aborting to prevent lockout."
+fi
+
 sed -i 's/^#\?PasswordAuthentication.*/PasswordAuthentication no/' /etc/ssh/sshd_config
 sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin no/' /etc/ssh/sshd_config
 systemctl reload sshd
