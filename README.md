@@ -213,6 +213,31 @@ After this, `ssh christopher@optiplex.local` should log in without a password.
 4. Set **Key** to the contents of `/opt/rustdesk/id_ed25519.pub` on the server
 5. The server's RustDesk ID appears in the main window — enter it to connect
 
+### Samba (network drive — browse and copy files)
+
+After running `sudo smbpasswd -a christopher` on the server:
+
+**Map a network drive in Windows Explorer:**
+
+1. Open File Explorer → right-click **This PC** → **Map network drive**
+2. Choose a drive letter (e.g. `Z:`)
+3. Folder: `\\optiplex\media` (or `\\optiplex\home` for your home directory)
+4. Check **Reconnect at sign-in** → **Connect using different credentials**
+5. Enter `christopher` and your Samba password
+
+Or connect from the Run dialog (`Win+R`):
+
+```
+\\optiplex.local
+```
+
+Both shares appear — `media` (full `/media` directory) and `home` (`/home/christopher`).
+
+**Drop files into Jellyfin:** copy to `\\optiplex\media\` in a `movies`, `tv`, or `music` subfolder and Jellyfin will pick them up on the next library scan.
+**Drop documents into Paperless:** copy to `\\optiplex\media\paperless\consume\` and Paperless will OCR and import them automatically.
+
+Over Tailscale (remote), use the Tailscale IP instead of the hostname: `\\100.x.x.x\media`
+
 ### Accessing Services from Windows
 
 On the local network, use `http://optiplex.local:<port>` for any service.
@@ -265,6 +290,20 @@ Over Tailscale (remote), replace `optiplex.local` with the server's Tailscale IP
 1. Install **Dawarich** from the App Store
 2. Server URL: `http://optiplex.local:3030` (local) or Tailscale IP (remote)
 3. Log in and the app will begin sending location updates to your self-hosted instance
+
+### Samba (browse and copy files via Files app)
+
+After running `sudo smbpasswd -a christopher` on the server:
+
+1. Open the **Files** app on iPhone
+2. Tap **...** (top right) → **Connect to Server**
+3. Enter `smb://optiplex.local` → tap **Connect**
+4. Choose **Registered User**, enter `christopher` and your Samba password
+5. Both shares appear — tap `media` or `home` to browse
+
+You can copy files to/from the server directly in Files, including dropping documents into `media/paperless/consume/` for Paperless to import.
+
+Over Tailscale (remote), use `smb://100.x.x.x` with your Tailscale IP instead.
 
 ### Accessing Services from iPhone
 
@@ -356,6 +395,42 @@ RustDesk runs two services:
 - **SSH hardening** — password auth disabled, root login disabled. Ensure your key is in `~/.ssh/authorized_keys` before running setup.sh or you will lock yourself out
 - **unattended-upgrades** — security patches applied automatically
 - **Timeshift** — configure snapshots manually after install: `sudo timeshift-gtk`
+- **Samba** — restricted to LAN and Tailscale IP ranges in smb.conf (`hosts allow`). Not exposed to the internet even if UFW rules are open
+
+## Samba (File Sharing)
+
+Installed by setup.sh. Exposes two shares:
+
+| Share | Path | Use |
+|-------|------|-----|
+| `media` | `/media` | Jellyfin libraries, Audiobookshelf, Paperless consume, general storage |
+| `home` | `/home/christopher` | Personal files, dotfiles, Obsidian vault |
+
+**First-time setup — set your Samba password:**
+
+```bash
+sudo smbpasswd -a christopher
+# Enter and confirm a password — this is separate from your Linux login password
+```
+
+**Useful commands:**
+
+```bash
+# Check Samba is running
+sudo systemctl status smbd
+
+# Test your config file for errors
+testparm
+
+# List connected users
+sudo smbstatus
+
+# Restart after config changes
+sudo systemctl restart smbd nmbd
+```
+
+**Connect from Windows:** `\\optiplex.local\media` — see the Windows section above.
+**Connect from iPhone:** Files app → Connect to Server → `smb://optiplex.local` — see the iPhone section above.
 
 ## Uptime Kuma Monitor List
 
