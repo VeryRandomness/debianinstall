@@ -158,6 +158,119 @@ Format all as **ext4**.
 - **Use manual partitioning** during Debian install to set this layout up exactly
 - **Set up services headlessly first** via SSH, then layer the desktop environment on top
 - **Docker group** — after setup.sh runs, log out and back in before running docker commands without sudo
+- **hostname.local** — Avahi mDNS is installed by setup.sh so the server is reachable as `<hostname>.local` (e.g. `optiplex.local`) from any device on the same network without needing a static IP
+
+## Connecting from Windows PC
+
+### SSH Access
+
+Windows 10 and 11 include a built-in SSH client and SSH key tools.
+
+**Generate a key (if you don't already have one) — run in PowerShell:**
+
+```powershell
+ssh-keygen -t ed25519 -C "windows-pc"
+# Accept the default path: C:\Users\<you>\.ssh\id_ed25519
+# Set a passphrase when prompted
+```
+
+**Copy the public key to the server:**
+
+```powershell
+# Replace with your server's local IP or hostname.local
+type $env:USERPROFILE\.ssh\id_ed25519.pub | ssh christopher@optiplex.local "mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys && chmod 700 ~/.ssh && chmod 600 ~/.ssh/authorized_keys"
+```
+
+After this, `ssh christopher@optiplex.local` should log in without a password.
+
+### Tailscale (remote access from anywhere)
+
+1. Download and install Tailscale from <https://tailscale.com/download/windows>
+2. Sign in with the same account used when running `tailscale up` on the server
+3. The server appears in the Tailscale dashboard with a `100.x.x.x` IP
+4. You can now SSH, open browser services, and use Syncthing remotely over the Tailscale IP
+
+### Syncthing
+
+1. Download Syncthing from <https://syncthing.net/downloads/> (use the Windows installer)
+2. Open the Syncthing web UI at <http://127.0.0.1:8384> on the Windows machine
+3. Copy the **Device ID** from Actions → Show ID
+4. On the server, go to <http://optiplex.local:8384> → Add Remote Device → paste the Windows Device ID
+5. Share the desired folder (e.g. your Obsidian vault) from the server to the Windows device
+6. Accept the share in the Windows Syncthing UI
+
+### Bitwarden / Vaultwarden
+
+1. Install the Bitwarden browser extension (Chrome, Firefox, Edge — all supported)
+2. Click the extension → Settings → **Server URL** → enter `http://optiplex.local:8222`
+3. Log in with your Vaultwarden account
+
+### RustDesk (remote desktop into the server)
+
+1. Download RustDesk client from <https://rustdesk.com/> and install
+2. Open RustDesk → Settings → Network → **ID/Relay Server**
+3. Set **ID Server** and **Relay Server** both to `optiplex.local` (or the Tailscale IP for remote access)
+4. Set **Key** to the contents of `/opt/rustdesk/id_ed25519.pub` on the server
+5. The server's RustDesk ID appears in the main window — enter it to connect
+
+### Accessing Services from Windows
+
+On the local network, use `http://optiplex.local:<port>` for any service.
+Over Tailscale (remote), replace `optiplex.local` with the server's Tailscale IP (`100.x.x.x`).
+
+---
+
+## Connecting from iPhone
+
+### Tailscale (remote access from anywhere)
+
+1. Install **Tailscale** from the App Store
+2. Sign in with the same account used on the server
+3. Enable the VPN — the server and all its services are now reachable remotely via its Tailscale IP
+
+### Syncthing — Möbius Sync
+
+1. Install **Möbius Sync** ($4 one-time) from the App Store
+2. Create a new folder in Möbius Sync and note the device ID (Settings → Device ID)
+3. On the server at <http://optiplex.local:8384>, add a remote device with that ID
+4. Share the folder from the server to the iPhone and accept it in Möbius Sync
+5. The folder syncs over the local network and automatically via Tailscale when remote
+
+### Bitwarden / Vaultwarden
+
+1. Install **Bitwarden** from the App Store
+2. Tap **Log In** → **Self-hosted** → enter `http://optiplex.local:8222` (or Tailscale IP)
+3. Log in with your Vaultwarden account
+
+### RustDesk (remote desktop into the server)
+
+1. Install **RustDesk** from the App Store
+2. Tap the menu → **ID/Relay Server** → set both to `optiplex.local` or the Tailscale IP
+3. Set the **Key** to the contents of `/opt/rustdesk/id_ed25519.pub`
+4. Enter the server's RustDesk ID to connect
+
+### Jellyfin
+
+1. Install **Jellyfin** from the App Store (official client)
+2. Add server: `http://optiplex.local:8096` on local network, or Tailscale IP remotely
+3. Enable hardware transcoding in Jellyfin server settings (Dashboard → Playback → Intel QuickSync) so the i5-6500's Quick Sync GPU handles transcoding instead of the CPU
+
+### Audiobookshelf
+
+1. Install **Audiobookshelf** from the App Store (official client)
+2. Server URL: `http://optiplex.local:13378`
+
+### Dawarich (location tracking)
+
+1. Install **Dawarich** from the App Store
+2. Server URL: `http://optiplex.local:3030` (local) or Tailscale IP (remote)
+3. Log in and the app will begin sending location updates to your self-hosted instance
+
+### Accessing Services from iPhone
+
+Safari and other iOS browsers support mDNS — `http://optiplex.local:<port>` works directly on the local network. Use the Tailscale IP when away from home.
+
+---
 
 ## Docker Services
 

@@ -130,6 +130,12 @@ apt install -y syncthing
 step "Installing Tailscale..."
 curl -fsSL https://tailscale.com/install.sh | sh
 
+# ── Avahi mDNS ────────────────────────────────────────────────
+step "Installing Avahi mDNS daemon..."
+apt install -y avahi-daemon libnss-mdns
+# Lets iPhone, Windows 10+, and macOS discover the server as hostname.local
+# without needing a static IP or DNS server on the local network.
+
 # ── playit.gg ─────────────────────────────────────────────────
 step "Installing playit.gg..."
 curl -SsL https://playit-cloud.github.io/ppa/key.gpg \
@@ -702,6 +708,7 @@ ufw allow 21116/udp     # RustDesk hbbs
 ufw allow 21117/tcp     # RustDesk hbbr
 ufw allow 21118/tcp     # RustDesk hbbs (web)
 ufw allow 21119/tcp     # RustDesk hbbr (web)
+ufw allow 5353/udp      # mDNS (Avahi — hostname.local discovery)
 ufw --force enable
 
 # ── Security: fail2ban ────────────────────────────────────────
@@ -991,6 +998,7 @@ systemctl enable --now docker
 # All Docker services (ABS, Stirling-PDF, HomeBox, Uptime Kuma, Paperless) managed by Docker
 systemctl enable --now rustdesk-hbbs
 systemctl enable --now rustdesk-hbbr
+systemctl enable --now avahi-daemon
 # Game servers — enable but don't start (configure first)
 systemctl enable minecraft
 systemctl enable terraria
