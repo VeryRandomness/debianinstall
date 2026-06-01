@@ -136,6 +136,44 @@ apt install -y avahi-daemon libnss-mdns
 # Lets iPhone, Windows 10+, and macOS discover the server as hostname.local
 # without needing a static IP or DNS server on the local network.
 
+# ── Samba (file sharing) ──────────────────────────────────────
+step "Installing Samba..."
+apt install -y samba
+
+cat > /etc/samba/smb.conf <<EOF
+[global]
+   workgroup = WORKGROUP
+   server string = ${HOSTNAME:-server}
+   security = user
+   map to guest = never
+   # Restrict to LAN and Tailscale — never expose Samba to the internet
+   hosts allow = 127.0.0.1 192.168.0.0/16 10.0.0.0/8 172.16.0.0/12 100.64.0.0/10
+   hosts deny = ALL
+   log file = /var/log/samba/log.%m
+   max log size = 1000
+   logging = file
+
+[media]
+   comment = Media and file storage
+   path = /media
+   browseable = yes
+   writable = yes
+   valid users = ${REAL_USER}
+   create mask = 0664
+   directory mask = 0775
+
+[home]
+   comment = Home directory
+   path = /home/${REAL_USER}
+   browseable = yes
+   writable = yes
+   valid users = ${REAL_USER}
+   create mask = 0640
+   directory mask = 0750
+EOF
+
+warn "Samba is installed but needs a password. Run after this script: sudo smbpasswd -a ${REAL_USER}"
+
 # ── playit.gg ─────────────────────────────────────────────────
 step "Installing playit.gg..."
 curl -SsL https://playit-cloud.github.io/ppa/key.gpg \
@@ -709,6 +747,10 @@ ufw allow 21117/tcp     # RustDesk hbbr
 ufw allow 21118/tcp     # RustDesk hbbs (web)
 ufw allow 21119/tcp     # RustDesk hbbr (web)
 ufw allow 5353/udp      # mDNS (Avahi — hostname.local discovery)
+ufw allow 445/tcp       # Samba SMB
+ufw allow 139/tcp       # Samba NetBIOS session
+ufw allow 137/udp       # Samba NetBIOS name service
+ufw allow 138/udp       # Samba NetBIOS datagram
 ufw --force enable
 
 # ── Security: fail2ban ────────────────────────────────────────
@@ -999,6 +1041,7 @@ systemctl enable --now docker
 systemctl enable --now rustdesk-hbbs
 systemctl enable --now rustdesk-hbbr
 systemctl enable --now avahi-daemon
+systemctl enable --now smbd nmbd
 # Game servers — enable but don't start (configure first)
 systemctl enable minecraft
 systemctl enable terraria
@@ -1045,4 +1088,6 @@ echo -e "   16. Linkding: docker exec -it linkding python manage.py createsuperu
 echo -e "   17. Paperless: docker compose -f /opt/paperless/docker-compose.yml exec webserver createsuperuser"
 echo -e "   18. AMP: register free at cubecoders.com then run: sudo /opt/install-amp.sh"
 echo -e "       Set port to 8081 during AMP wizard (8080 is taken by Stirling-PDF)"
+echo -e "   19. Samba: sudo smbpasswd -a ${REAL_USER}"
+echo -e "       Shares available after that: \\\\\\\\$(hostname)\\\\media  and  \\\\\\\\$(hostname)\\\\home"
 echo ""
