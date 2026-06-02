@@ -635,7 +635,7 @@ cat > /opt/dawarich/docker-compose.yml <<EOF
 version: "3.8"
 services:
   dawarich_db:
-    image: postgres:17
+    image: postgis/postgis:17-3.5
     container_name: dawarich_db
     restart: unless-stopped
     volumes:
