@@ -258,10 +258,11 @@ step "Installing RustDesk server..."
 mkdir -p /opt/rustdesk
 RUSTDESK_VER=$(curl -s https://api.github.com/repos/rustdesk/rustdesk-server/releases/latest \
     | grep '"tag_name"' | cut -d'"' -f4)
-wget -q -O /tmp/rustdesk-server.zip \
+[[ -z "$RUSTDESK_VER" ]] && fatal "Could not fetch RustDesk version from GitHub API — check network or API rate limit and re-run."
+wget -O /tmp/rustdesk-server.zip \
     "https://github.com/rustdesk/rustdesk-server/releases/download/${RUSTDESK_VER}/rustdesk-server-linux-amd64.zip"
-apt install -y unzip
-unzip -q /tmp/rustdesk-server.zip -d /opt/rustdesk
+# -j strips directory paths so binaries land directly in /opt/rustdesk regardless of zip structure
+unzip -j -o /tmp/rustdesk-server.zip "*/hbbs" "*/hbbr" -d /opt/rustdesk
 chmod +x /opt/rustdesk/hbbs /opt/rustdesk/hbbr
 
 # hbbs = ID/rendezvous server  (ports 21115, 21116 TCP+UDP, 21118)
