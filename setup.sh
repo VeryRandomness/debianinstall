@@ -175,7 +175,7 @@ warn "Samba is installed but needs a password. Run after this script: sudo smbpa
 
 # ── playit.gg ─────────────────────────────────────────────────
 step "Installing playit.gg..."
-curl -SsL https://playit-cloud.github.io/ppa/playit-cloud.gpg \
+curl -SsL https://playit-cloud.github.io/ppa/key.gpg \
     | gpg --dearmor -o /usr/share/keyrings/playit-cloud.gpg
 echo "deb [signed-by=/usr/share/keyrings/playit-cloud.gpg] https://playit-cloud.github.io/ppa/v0 main main" \
     > /etc/apt/sources.list.d/playit-cloud.list
