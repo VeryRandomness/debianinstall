@@ -25,7 +25,6 @@ apt update && apt upgrade -y
 apt install -y \
     curl wget git gnupg lsb-release \
     apt-transport-https ca-certificates \
-    software-properties-common \
     lib32gcc-s1 \
     python3 \
     rsync \
@@ -176,10 +175,9 @@ warn "Samba is installed but needs a password. Run after this script: sudo smbpa
 
 # ── playit.gg ─────────────────────────────────────────────────
 step "Installing playit.gg..."
-curl -SsL https://playit-cloud.github.io/ppa/key.gpg \
+curl -SsL https://playit-cloud.github.io/ppa/playit-cloud.gpg \
     | gpg --dearmor -o /usr/share/keyrings/playit-cloud.gpg
-echo "deb [signed-by=/usr/share/keyrings/playit-cloud.gpg] \
-https://playit-cloud.github.io/ppa/v0 main" \
+echo "deb [signed-by=/usr/share/keyrings/playit-cloud.gpg] https://playit-cloud.github.io/ppa/v0 main main" \
     > /etc/apt/sources.list.d/playit-cloud.list
 apt update
 apt install -y playit
