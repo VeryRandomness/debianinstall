@@ -747,7 +747,13 @@ ufw allow 445/tcp       # Samba SMB
 ufw allow 139/tcp       # Samba NetBIOS session
 ufw allow 137/udp       # Samba NetBIOS name service
 ufw allow 138/udp       # Samba NetBIOS datagram
+# Allow UFW to forward Docker container traffic (required for internet access in containers)
+sed -i 's/DEFAULT_FORWARD_POLICY="DROP"/DEFAULT_FORWARD_POLICY="ACCEPT"/' /etc/default/ufw
 ufw --force enable
+
+# Enable IP forwarding for Docker
+sysctl -w net.ipv4.ip_forward=1
+echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf
 
 # ── Security: fail2ban ────────────────────────────────────────
 step "Installing fail2ban..."
