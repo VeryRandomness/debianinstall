@@ -357,11 +357,13 @@ warn "  docker compose -f /opt/paperless/docker-compose.yml exec webserver creat
 
 # ── Brave Browser ─────────────────────────────────────────────
 step "Installing Brave browser..."
+# Remove the .sources file Brave's own installer creates to avoid duplicate source warnings
+rm -f /etc/apt/sources.list.d/brave-browser-release.sources
 curl -fsSL https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg \
-    | gpg --dearmor -o /usr/share/keyrings/brave-browser-archive-keyring.gpg
+    | gpg --dearmor > /usr/share/keyrings/brave-browser-archive-keyring.gpg
 echo "deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg arch=amd64] \
 https://brave-browser-apt-release.s3.brave.com/ stable main" \
-    | tee /etc/apt/sources.list.d/brave-browser-release.list
+    > /etc/apt/sources.list.d/brave-browser-release.list
 apt update
 apt install -y brave-browser
 
