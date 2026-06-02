@@ -174,13 +174,13 @@ EOF
 warn "Samba is installed but needs a password. Run after this script: sudo smbpasswd -a ${REAL_USER}"
 
 # ── playit.gg ─────────────────────────────────────────────────
-step "Installing playit.gg..."
-curl -SsL https://playit-cloud.github.io/ppa/key.gpg \
-    -o /usr/share/keyrings/playit-cloud.gpg
-echo "deb [signed-by=/usr/share/keyrings/playit-cloud.gpg] https://playit-cloud.github.io/ppa/v0 ./" \
-    > /etc/apt/sources.list.d/playit-cloud.list
-apt update
-apt install -y playit
+# Commented out — install manually from https://playit.gg/downloads
+# curl -SsL https://playit-cloud.github.io/ppa/key.gpg \
+#     -o /usr/share/keyrings/playit-cloud.gpg
+# echo "deb [signed-by=/usr/share/keyrings/playit-cloud.gpg] https://playit-cloud.github.io/ppa/v0 ./" \
+#     > /etc/apt/sources.list.d/playit-cloud.list
+# apt update
+# apt install -y playit
 
 # ── Minecraft (vanilla) ───────────────────────────────────────
 step "Installing Minecraft server..."
