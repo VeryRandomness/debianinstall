@@ -262,7 +262,7 @@ RUSTDESK_VER=$(curl -s https://api.github.com/repos/rustdesk/rustdesk-server/rel
 wget -O /tmp/rustdesk-server.zip \
     "https://github.com/rustdesk/rustdesk-server/releases/download/${RUSTDESK_VER}/rustdesk-server-linux-amd64.zip"
 # -j strips directory paths so binaries land directly in /opt/rustdesk regardless of zip structure
-unzip -j -o /tmp/rustdesk-server.zip "*/hbbs" "*/hbbr" -d /opt/rustdesk
+unzip -j -o /tmp/rustdesk-server.zip -d /opt/rustdesk
 chmod +x /opt/rustdesk/hbbs /opt/rustdesk/hbbr
 
 # hbbs = ID/rendezvous server  (ports 21115, 21116 TCP+UDP, 21118)
