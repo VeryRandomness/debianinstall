@@ -679,7 +679,7 @@ services:
       DATABASE_USERNAME: dawarich
       DATABASE_PASSWORD: dawarich
       REDIS_URL: redis://dawarich_redis:6379/0
-      APPLICATION_HOSTS: localhost,127.0.0.1
+      APPLICATION_HOSTS: "localhost,127.0.0.1,100.64.0.0/10"
       APPLICATION_PROTOCOL: http
       SECRET_KEY_BASE: ${DAWARICH_SECRET}
       MIN_MINUTES_SPENT_IN_CITY: 60
@@ -707,7 +707,7 @@ services:
       DATABASE_USERNAME: dawarich
       DATABASE_PASSWORD: dawarich
       REDIS_URL: redis://dawarich_redis:6379/0
-      APPLICATION_HOSTS: localhost,127.0.0.1
+      APPLICATION_HOSTS: "localhost,127.0.0.1,100.64.0.0/10"
       APPLICATION_PROTOCOL: http
       SECRET_KEY_BASE: ${DAWARICH_SECRET}
     restart: unless-stopped
