@@ -679,7 +679,7 @@ services:
       DATABASE_USERNAME: dawarich
       DATABASE_PASSWORD: dawarich
       REDIS_URL: redis://dawarich_redis:6379/0
-      APPLICATION_HOSTS: "localhost,127.0.0.1,100.64.0.0/10"
+      APPLICATION_HOSTS: "localhost,127.0.0.1"
       APPLICATION_PROTOCOL: http
       SECRET_KEY_BASE: ${DAWARICH_SECRET}
       MIN_MINUTES_SPENT_IN_CITY: 60
@@ -706,7 +706,7 @@ services:
       DATABASE_USERNAME: dawarich
       DATABASE_PASSWORD: dawarich
       REDIS_URL: redis://dawarich_redis:6379/0
-      APPLICATION_HOSTS: "localhost,127.0.0.1,100.64.0.0/10"
+      APPLICATION_HOSTS: "localhost,127.0.0.1"
       APPLICATION_PROTOCOL: http
       SECRET_KEY_BASE: ${DAWARICH_SECRET}
     restart: unless-stopped
@@ -714,6 +714,7 @@ EOF
 
 cd /opt/dawarich && docker compose pull && docker compose up -d
 warn "Dawarich default login: demo@dawarich.app / password — change immediately at http://localhost:3030"
+warn "Dawarich: add your Tailscale IP to APPLICATION_HOSTS in /opt/dawarich/docker-compose.yml to allow remote access."
 
 
 apt install -y ufw
