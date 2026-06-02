@@ -629,7 +629,7 @@ warn "During AMP setup, set the port to 8081 (Stirling-PDF uses 8080)"
 # ── Dawarich (Docker) ─────────────────────────────────────────
 step "Installing Dawarich (location history)..."
 mkdir -p /opt/dawarich
-mkdir -p /media/dawarich/{db,gem-cache,public,watched,exports}
+mkdir -p /media/dawarich/{db,public,watched,exports}
 DAWARICH_SECRET=$(openssl rand -hex 64)
 cat > /opt/dawarich/docker-compose.yml <<EOF
 version: "3.8"
@@ -667,7 +667,6 @@ services:
     ports:
       - "3030:3000"
     volumes:
-      - /media/dawarich/gem-cache:/usr/local/bundle/gems
       - /media/dawarich/public:/var/app/public
       - /media/dawarich/watched:/var/app/tmp/imports/watched
       - /media/dawarich/exports:/var/app/public/exports
@@ -696,7 +695,6 @@ services:
       dawarich_redis:
         condition: service_started
     volumes:
-      - /media/dawarich/gem-cache:/usr/local/bundle/gems
       - /media/dawarich/public:/var/app/public
       - /media/dawarich/watched:/var/app/tmp/imports/watched
     environment:
