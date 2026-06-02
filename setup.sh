@@ -633,7 +633,7 @@ warn "During AMP setup, set the port to 8081 (Stirling-PDF uses 8080)"
 step "Installing Dawarich (location history)..."
 mkdir -p /opt/dawarich
 mkdir -p /media/dawarich/{db,gem-cache,public,watched,exports}
-
+DAWARICH_SECRET=$(openssl rand -hex 64)
 cat > /opt/dawarich/docker-compose.yml <<EOF
 version: "3.8"
 services:
@@ -684,7 +684,7 @@ services:
       REDIS_URL: redis://dawarich_redis:6379/0
       APPLICATION_HOSTS: localhost,127.0.0.1
       APPLICATION_PROTOCOL: http
-      SECRET_KEY_BASE: $(openssl rand -hex 64)
+      SECRET_KEY_BASE: ${DAWARICH_SECRET}
       MIN_MINUTES_SPENT_IN_CITY: 60
       TIME_ZONE: America/Chicago
     restart: unless-stopped
@@ -712,7 +712,7 @@ services:
       REDIS_URL: redis://dawarich_redis:6379/0
       APPLICATION_HOSTS: localhost,127.0.0.1
       APPLICATION_PROTOCOL: http
-      SECRET_KEY_BASE: $(openssl rand -hex 64)
+      SECRET_KEY_BASE: ${DAWARICH_SECRET}
     restart: unless-stopped
 EOF
 
