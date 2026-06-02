@@ -659,6 +659,7 @@ services:
   dawarich_app:
     image: freikin/dawarich:latest
     container_name: dawarich_app
+    command: sh -c "bundle exec rails db:migrate && bundle exec rails server -b 0.0.0.0 -p 3000"
     depends_on:
       dawarich_db:
         condition: service_healthy
