@@ -486,6 +486,8 @@ services:
       - /media/homepage/icons:/app/public/icons
       - /media/homepage/images:/app/public/images
       - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      HOMEPAGE_ALLOWED_HOSTS: "*"
     restart: unless-stopped
 EOF
 
